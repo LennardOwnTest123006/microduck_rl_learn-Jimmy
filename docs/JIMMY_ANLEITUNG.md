@@ -1,5 +1,7 @@
 # Jimmy (Microduck) – alle Skills trainieren und auf den Roboter bringen
 
+Besitzer: Lennard · Roboter: Jimmy · Hugging-Face-User: User1
+
 ## Ehrlicher Stand
 - Fertig vortrainierte Policies (Laufen, Aufstehen, Sit/Stand, Ball kicken, Aufheben …) liegen schon
   offiziell auf Hugging Face: `pollen-robotics/microduck-policies`. Das ist der **schnellste Weg**:
@@ -32,15 +34,15 @@ Pro Skill (Run-Pfad steht in wandb):
 ```bash
 uv run publish --task Mjlab-BallKick-Flat-MicroDuck \
   --wandb-run-path <entity/project/run_id> --checkpoint <N> \
-  --repo <dein-user>/microduck-ball-kick --kind episodic --duration-s 4.0
+  --repo User1/microduck-ball-kick --kind episodic --duration-s 4.0
 ```
 Ein Gang (Laufen) bekommt stattdessen `--kind perpetual --slot walk`.
 Nie ein `.pt` selbst in ONNX umwandeln – immer `publish`/`scripts/export.py` benutzen.
 
 ## Schritt 4 – Auf Jimmy installieren (auf dem Roboter)
 ```bash
-sudo robotctl policy add ball-kick <dein-user>/microduck-ball-kick
-sudo robotctl policy load walk <dein-user>/microduck-my-walk
+sudo robotctl policy add ball-kick User1/microduck-ball-kick
+sudo robotctl policy load walk User1/microduck-my-walk
 robotctl robot do ball-kick
 ```
 Die offiziellen, schon fertigen Skills nimmst du aus `pollen-robotics/microduck-policies`

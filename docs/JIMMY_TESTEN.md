@@ -1,7 +1,7 @@
 # Jimmy am PC testen (alle Skills, per Tastatur steuern)
 
 `scripts/infer_policy.py` ist der Test-Simulator: 3D-Fenster, Steuerung per Tastatur, mehrere Policies gleichzeitig.
-Es braucht keine GPU. ACHTUNG: es nutzt `termios` (Linux/Mac). Unter Windows deshalb **WSL2 (Ubuntu)** verwenden.
+Es braucht keine GPU. Läuft jetzt auch direkt unter Windows 11 (Tastatur über `msvcrt`, unerprobt auf echtem Windows). WSL2 ist nicht nötig.
 
 ## Windows: WSL2 einrichten (einmalig)
 PowerShell als Administrator: `wsl --install -d Ubuntu`, PC neu starten, Ubuntu-Benutzer anlegen.

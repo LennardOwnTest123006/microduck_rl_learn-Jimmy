@@ -10,10 +10,14 @@ import pickle
 import queue
 import select
 import sys
-import termios
 import threading
 import time
-import tty
+
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import termios
+    import tty
 import numpy as np
 import mujoco
 import mujoco.viewer
@@ -157,13 +161,16 @@ class TerminalInput:
     def __init__(self):
         self._queue = queue.Queue()
         self.enabled = sys.stdin.isatty()
-        self._fd = sys.stdin.fileno() if self.enabled else -1
+        self._fd = sys.stdin.fileno() if (self.enabled and sys.platform != "win32") else -1
         self._old_attrs = None
         self._stop = threading.Event()
 
     def __enter__(self):
         if not self.enabled:
             print("WARNING: stdin is not a TTY — keyboard control disabled")
+            return self
+        if sys.platform == "win32":
+            threading.Thread(target=self._reader_windows, daemon=True).start()
             return self
         self._old_attrs = termios.tcgetattr(self._fd)
         tty.setcbreak(self._fd)
@@ -172,7 +179,7 @@ class TerminalInput:
 
     def __exit__(self, *exc):
         self._stop.set()
-        if self._old_attrs is not None:
+        if self._old_attrs is not None and sys.platform != "win32":
             termios.tcsetattr(self._fd, termios.TCSADRAIN, self._old_attrs)
 
     def _read1(self, timeout):
@@ -184,6 +191,26 @@ class TerminalInput:
             return None
         data = os.read(self._fd, 1)
         return data.decode(errors="ignore") if data else None
+
+    _WIN_ARROWS = {"H": "up", "P": "down", "M": "right", "K": "left"}
+
+    def _reader_windows(self):
+        """Windows console: msvcrt returns arrows as a '\\x00'/'\\xe0' prefix + H/P/M/K."""
+        while not self._stop.is_set():
+            if not msvcrt.kbhit():
+                time.sleep(0.02)
+                continue
+            ch = msvcrt.getwch()
+            if ch in ("\x00", "\xe0"):
+                name = self._WIN_ARROWS.get(msvcrt.getwch())
+                if name:
+                    self._queue.put(name)
+                continue
+            if ch == "\x03":  # Ctrl+C
+                import _thread
+                _thread.interrupt_main()
+                continue
+            self._queue.put(ch.lower() if ch.isalpha() else ch)
 
     def _reader(self):
         while not self._stop.is_set():

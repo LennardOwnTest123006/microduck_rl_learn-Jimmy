@@ -49,3 +49,8 @@ Die offiziellen, schon fertigen Skills nimmst du aus `pollen-robotics/microduck-
 ## Eigene Tricks
 Neue Env nach dem Workflow in `AGENTS.md` bauen (nächstes Template wählen, Smoke-Test, trainieren),
 dann wie oben veröffentlichen. Testen am PC vor dem Roboter: `uv run scripts/infer_policy.py --walking out.onnx`.
+
+## Gratis-GPU: Google Colab
+`scripts/jimmy_colab.ipynb` in colab.research.google.com öffnen (Datei > Notebook hochladen), GPU (T4) wählen,
+Zellen der Reihe nach ausführen. Ein Task pro Sitzung, Checkpoints auf Drive sichern. Unerprobt: ob die T4 mit
+mjlab/MuJoCo-Warp reicht und wie lange ein Task dort dauert, ist nicht getestet.
